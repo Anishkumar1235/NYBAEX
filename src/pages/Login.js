@@ -133,7 +133,7 @@ function Login() {
         alert(response.data.message);
 
         if (!response.data.isProfileComplete) {
-          navigate("/register"); // Navigate to profile completion if required
+          navigate(`/register?userId=${response.data.userId}`); // Navigate to profile completion
         } else {
           // If login successful
           const { token } = response.data;
@@ -253,3 +253,4 @@ function Login() {
 }
 
 export default Login;
+

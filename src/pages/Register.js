@@ -246,11 +246,11 @@
 
 // export default Login;
 
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
-function Login() {
+function Register() {
   const [formData, setFormData] = useState({
     name: "",
     occupation: "",
@@ -258,11 +258,11 @@ function Login() {
     reasonsForInvoiceDiscounting: [],
     referralCode: "",
   });
-
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [isProfileComplete, setIsProfileComplete] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const userId = searchParams.get("userId");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -282,172 +282,156 @@ function Login() {
     e.preventDefault();
     setIsLoading(true);
 
-    const {
-      name,
-      occupation,
-      participatedIn,
-      reasonsForInvoiceDiscounting,
-      referralCode,
-    } = formData;
-
     try {
-      // Send registration data
-      const response = await axios.post(
-        "http://localhost:8501/api/v1/users/register-or-login",
-        {
-          name,
-          occupation,
-          participatedIn,
-          reasonsForInvoiceDiscounting,
-          referralCode,
-        }
+      const response = await axios.put(
+        `http://localhost:8501/api/v1/users/complete-profile/${userId}`,
+        formData
       );
 
-      if (response.data.isNewUser) {
-        setMessage("User registered successfully, OTP sent for verification");
-        navigate("/verify-otp");
-      } else {
-        setMessage(response.data.message);
-        setIsProfileComplete(response.data.isProfileComplete);
-        navigate(isProfileComplete ? "/c-dashboard" : "/i-dashboard");
+      if (response.data.token) {
+        // Store the token in localStorage
+        localStorage.setItem("authToken", response.data.token);
+
+        alert(response.data.message);
+        navigate("/dashboard"); // Navigate to the dashboard
       }
     } catch (error) {
-      setMessage("Error registering user. Please try again.");
+      console.error("Error completing profile:", error);
+      setMessage("Error completing profile. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <>
-      <div className="login-bg vh-100 vw-100">
-        <div className="container h-100 w-100 d-flex align-items-center">
-          <div className="col-lg-5 col-md-7 col-12 offset-lg-7 offset-md-5">
-            <div className="p-5 rounded-4 bg-white">
-              <h2 className="lh-1 mb-2">
-                Create Account: Finish Your Registration Process
-              </h2>
-              <form onSubmit={handleSubmit}>
-                <div className="mt-4">
-                  <label>Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    className="form-control mt-1"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Your Name"
-                    required
-                  />
-                </div>
-                <div className="mt-3">
-                  <label>What is your occupation?</label>
-                  <select
-                    name="occupation"
-                    className="form-control mt-1"
-                    value={formData.occupation}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option>Salaried</option>
-                    <option>Self-employed</option>
-                    <option>Professional</option>
-                    <option>Retired</option>
-                  </select>
-                </div>
-
-                <div className="mt-4">
-                  <label>Have you participated in any of these?</label>
-                  {[
-                    "Invoice Discounting",
-                    "Real Estate",
-                    "Stocks/Market Funds",
-                    "Bonds/FD/RD",
-                    "AIF",
-                    "Startups",
-                    "Portfolio Management Services",
-                  ].map((option, idx) => (
-                    <div key={idx} className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id={`participatedIn${idx}`}
-                        name="participatedIn"
-                        value={option}
-                        checked={formData.participatedIn.includes(option)}
-                        onChange={handleChange}
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor={`participatedIn${idx}`}
-                      >
-                        {option}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-4">
-                  <label>Why are you opting for Invoice Discounting?</label>
-                  {[
-                    "High Return - P.A",
-                    "Secured – Confirmed cash flows from top OTTs",
-                    "Short Term – Receive return within 1-12 months",
-                    "Diversification",
-                    "Other",
-                  ].map((reason, idx) => (
-                    <div key={idx} className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id={`reasonForInvoiceDiscounting${idx}`}
-                        name="reasonsForInvoiceDiscounting"
-                        value={reason}
-                        checked={formData.reasonsForInvoiceDiscounting.includes(
-                          reason
-                        )}
-                        onChange={handleChange}
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor={`reasonForInvoiceDiscounting${idx}`}
-                      >
-                        {reason}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-4">
-                  <label>Referral Code (Optional)</label>
-                  <input
-                    type="text"
-                    name="referralCode"
-                    className="form-control mt-1"
-                    value={formData.referralCode}
-                    onChange={handleChange}
-                    placeholder="Referral Code"
-                  />
-                </div>
-
-                {message && (
-                  <div className="alert alert-info mt-3">{message}</div>
-                )}
-
-                <button
-                  type="submit"
-                  className="btn btn-primary btn-lg mt-4 w-100 rounded-3 fs-5 text-dark"
-                  disabled={isLoading}
+    <div className="login-bg vh-100 vw-100">
+      <div className="container h-100 w-100 d-flex align-items-center">
+        <div className="col-lg-5 col-md-7 col-12 offset-lg-7 offset-md-5">
+          <div className="p-5 rounded-4 bg-white">
+            <h2 className="lh-1 mb-2">Complete Your Profile</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="mt-4">
+                <label>Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  className="form-control mt-1"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Your Name"
+                  required
+                />
+              </div>
+              <div className="mt-3">
+                <label>What is your occupation?</label>
+                <select
+                  name="occupation"
+                  className="form-control mt-1"
+                  value={formData.occupation}
+                  onChange={handleChange}
+                  required
                 >
-                  {isLoading ? "Registering..." : "Register Now"}
-                </button>
-              </form>
-            </div>
+                  <option value="">Select Occupation</option>
+                  <option value="Salaried">Salaried</option>
+                  <option value="Self-employed">Self-employed</option>
+                  <option value="Professional">Professional</option>
+                  <option value="Retired">Retired</option>
+                </select>
+              </div>
+
+              <div className="mt-4">
+                <label>Have you participated in any of these?</label>
+                {[
+                  "Invoice Discounting",
+                  "Real Estate",
+                  "Stocks/Market Funds",
+                  "Bonds/FD/RD",
+                  "AIF",
+                  "Startups",
+                  "Portfolio Management Services",
+                ].map((option, idx) => (
+                  <div key={idx} className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id={`participatedIn${idx}`}
+                      name="participatedIn"
+                      value={option}
+                      checked={formData.participatedIn.includes(option)}
+                      onChange={handleChange}
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor={`participatedIn${idx}`}
+                    >
+                      {option}
+                    </label>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4">
+                <label>Why are you opting for Invoice Discounting?</label>
+                {[
+                  "High Return - P.A",
+                  "Secured – Confirmed cash flows from top OTTs",
+                  "Short Term – Receive return within 1-12 months",
+                  "Diversification",
+                  "Other",
+                ].map((reason, idx) => (
+                  <div key={idx} className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id={`reasonForInvoiceDiscounting${idx}`}
+                      name="reasonsForInvoiceDiscounting"
+                      value={reason}
+                      checked={formData.reasonsForInvoiceDiscounting.includes(
+                        reason
+                      )}
+                      onChange={handleChange}
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor={`reasonForInvoiceDiscounting${idx}`}
+                    >
+                      {reason}
+                    </label>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4">
+                <label>Referral Code (Optional)</label>
+                <input
+                  type="text"
+                  name="referralCode"
+                  className="form-control mt-1"
+                  value={formData.referralCode}
+                  onChange={handleChange}
+                  placeholder="Referral Code"
+                />
+              </div>
+
+              {message && (
+                <div className="alert alert-info mt-3">{message}</div>
+              )}
+
+              <button
+                type="submit"
+                className="btn btn-primary btn-lg mt-4 w-100 rounded-3 fs-5 text-dark"
+                disabled={isLoading}
+              >
+                {isLoading ? "Submitting..." : "Complete Profile"}
+              </button>
+            </form>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
-export default Login;
+export default Register;
+
+
