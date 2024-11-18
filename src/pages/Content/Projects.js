@@ -834,7 +834,7 @@ function Projects() {
     const fetchProjects = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:9001/api/v1/projects/"
+          "http://localhost:8501/api/v1/projects/"
         );
         if (response.data && Array.isArray(response.data.data)) {
           setProjects(response.data.data); // Update projects with the nested data array
@@ -882,7 +882,7 @@ function Projects() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:9001/api/v1/projects/",
+        "http://localhost:8501/api/v1/projects/",
         newProject
       );
       setProjects((prevProjects) => [...prevProjects, response.data.data]);
@@ -917,7 +917,7 @@ function Projects() {
   const fetchProjectById = async (projectId) => {
     try {
       const response = await axios.get(
-        `http://localhost:9001/api/v1/projects/${projectId}`
+        `http://localhost:8501/api/v1/projects/${projectId}`
       );
       setSelectedProject(response.data.data); // Store the selected project details
     } catch (error) {

@@ -455,6 +455,8 @@ function Ready() {
 
 export default Ready;
 
+////////////////////////////////////////////////////////////////
+
 // import { useState } from "react";
 // import Axios from "axios";
 // import Header from "./Header";
@@ -781,6 +783,383 @@ export default Ready;
 //           </a>
 //         </div>
 //       </div>
+//     </>
+//   );
+// }
+
+// export default Ready;
+
+////////////////////////////////////////
+// import React, { useEffect, useState } from "react";
+// import axios from "axios";
+// import Header from "./Header"; // Assuming you have a Header component
+// import "bootstrap/dist/css/bootstrap.min.css";
+// import "bootstrap/dist/js/bootstrap.bundle.min.js";
+
+// function Ready() {
+//   const [projects, setProjects] = useState([]); // List of projects
+//   const [loading, setLoading] = useState(true); // Loading state
+//   const [selectedProject, setSelectedProject] = useState(null); // Selected project details
+//   const [newProject, setNewProject] = useState({
+//     contentType: "",
+//     language: "",
+//     projectName: "",
+//     poster: null,
+//     contract: null,
+//     description: "",
+//     trailer: null,
+//     productionHouse: "",
+//     producer: "",
+//     director: "",
+//     creativeDirector: "",
+//     writer: "",
+//     dop: "",
+//     contentFiles: "",
+//     castCrew: null,
+//     socialMediaLinks: "",
+//     castBite: null,
+//     clipCut: null,
+//     nocFile: null,
+//     budget: "",
+//   });
+
+//   // Fetch projects from the API when the component loads
+//   useEffect(() => {
+//     const fetchProjects = async () => {
+//       try {
+//         const response = await axios.get(
+//           "http://localhost:8501/api/v1/ready-to-release/"
+//         );
+//         if (response.data && Array.isArray(response.data.data)) {
+//           setProjects(response.data.data); // Assuming the API returns an array in `data.data`
+//         } else {
+//           console.error("Unexpected response format:", response.data);
+//         }
+//       } catch (error) {
+//         console.error("Error fetching projects:", error);
+//       } finally {
+//         setLoading(false); // Stop loading
+//       }
+//     };
+
+//     fetchProjects();
+//   }, []);
+
+//   // Handle input changes for non-file inputs
+//   const handleInputChange = (e) => {
+//     const { name, value } = e.target;
+//     setNewProject((prevProject) => ({
+//       ...prevProject,
+//       [name]: name === "budget" ? Number(value) : value, // Convert budget to a number
+//     }));
+//   };
+
+//   // Handle file changes for file inputs
+//   const handleFileChange = (e) => {
+//     const { name, files } = e.target;
+//     setNewProject((prevProject) => ({
+//       ...prevProject,
+//       [name]: files[0], // Store the first file from the input
+//     }));
+//   };
+
+//   // Handle form submission to add a new project
+//   const handleAddProject = async (e) => {
+//     e.preventDefault();
+//     const formData = new FormData();
+
+//     // Append all data to FormData for file uploads
+//     Object.keys(newProject).forEach((key) => {
+//       if (newProject[key]) {
+//         formData.append(key, newProject[key]);
+//       }
+//     });
+
+//     try {
+//       const response = await axios.post(
+//         "http://localhost:8501/api/v1/ready-to-release/",
+//         formData,
+//         {
+//           headers: { "Content-Type": "multipart/form-data" },
+//         }
+//       );
+
+//       if (response.data && response.data.data) {
+//         setProjects((prevProjects) => [...prevProjects, response.data.data]);
+//         alert("Project added successfully!");
+//         setNewProject({
+//           contentType: "",
+//           language: "",
+//           projectName: "",
+//           poster: null,
+//           contract: null,
+//           description: "",
+//           trailer: null,
+//           productionHouse: "",
+//           producer: "",
+//           director: "",
+//           creativeDirector: "",
+//           writer: "",
+//           dop: "",
+//           contentFiles: "",
+//           castCrew: null,
+//           socialMediaLinks: "",
+//           castBite: null,
+//           clipCut: null,
+//           nocFile: null,
+//           budget: "",
+//         });
+//       }
+//     } catch (error) {
+//       console.error("Error adding project:", error);
+//       alert("Failed to add project. Check console for details.");
+//     }
+//   };
+
+//   // Fetch project details by ID
+//   const fetchProjectById = async (projectId) => {
+//     try {
+//       const response = await axios.get(
+//         `http://localhost:8501/api/v1/ready-to-release/${projectId}`
+//       );
+//       if (response.data && response.data.data) {
+//         setSelectedProject(response.data.data); // Store selected project
+//       } else {
+//         console.error("Unexpected response format:", response.data);
+//       }
+//     } catch (error) {
+//       console.error("Error fetching project details:", error);
+//     }
+//   };
+
+//   return (
+//     <>
+//       <Header />
+//       <div className="container mt-2">
+//         <button
+//           data-bs-toggle="modal"
+//           data-bs-target="#addModal"
+//           className="btn btn-dark px-5 rounded-3 mt-3"
+//         >
+//           <span className="mx-2">Ready To Releasing</span>
+//         </button>
+//       </div>
+
+//       {/* Add Project Modal */}
+//       <div
+//         className="modal fade"
+//         id="addModal"
+//         tabIndex="-1"
+//         aria-labelledby="addModalLabel"
+//         aria-hidden="true"
+//       >
+//         <div className="modal-dialog modal-lg" style={{ maxWidth: "800px" }}>
+//           <div
+//             className="modal-content"
+//             style={{ width: "210mm", padding: "20mm" }}
+//           >
+//             <div className="modal-header">
+//               <h5 className="modal-title" id="addModalLabel">
+//                 Add New Project
+//               </h5>
+//               <button
+//                 type="button"
+//                 className="btn-close"
+//                 data-bs-dismiss="modal"
+//                 aria-label="Close"
+//               ></button>
+//             </div>
+//             <form onSubmit={handleAddProject}>
+//               <div
+//                 className="modal-body"
+//                 style={{ maxHeight: "60vh", overflowY: "auto" }}
+//               >
+//                 {/* Form Fields for Project Details */}
+//                 <div className="mb-3">
+//                   <label className="form-label">Project Name</label>
+//                   <input
+//                     type="text"
+//                     className="form-control"
+//                     name="projectName"
+//                     value={newProject.projectName}
+//                     onChange={handleInputChange}
+//                     required
+//                   />
+//                 </div>
+
+//                 {/* Category Field */}
+//                 <div className="mb-3">
+//                   <label className="form-label">Category</label>
+//                   <select
+//                     className="form-control"
+//                     name="category"
+//                     value={newProject.category}
+//                     onChange={handleInputChange}
+//                     required
+//                   >
+//                     <option value="">Select</option>
+//                     <option value="new project">New Project</option>
+//                     <option value="gap funding">Gap Funding</option>
+//                   </select>
+//                 </div>
+
+//                 {/* Content Type Field */}
+//                 <div className="mb-3">
+//                   <label className="form-label">Content Type</label>
+//                   <select
+//                     className="form-control"
+//                     name="contentType"
+//                     value={newProject.contentType}
+//                     onChange={handleInputChange}
+//                     required
+//                   >
+//                     <option value="">Select</option>
+//                     <option value="tvshow">TV Show</option>
+//                     <option value="webseries">Web Series</option>
+//                     <option value="movie">Movie</option>
+//                     <option value="shortfilm">Short Film</option>
+//                     <option value="regional">Regional</option>
+//                   </select>
+//                 </div>
+
+//                 {/* Language Field */}
+//                 <div className="mb-3">
+//                   <label className="form-label">Language</label>
+//                   <select
+//                     className="form-control"
+//                     name="language"
+//                     value={newProject.language}
+//                     onChange={handleInputChange}
+//                     required
+//                   >
+//                     <option value="">Select</option>
+//                     <option value="bengali">Bengali</option>
+//                     <option value="telugu">Telugu</option>
+//                     <option value="tamil">Tamil</option>
+//                     <option value="marathi">Marathi</option>
+//                     <option value="urdu">Urdu</option>
+//                     <option value="gujarati">Gujarati</option>
+//                     <option value="malayalam">Malayalam</option>
+//                     <option value="kannada">Kannada</option>
+//                     <option value="odia">Odia</option>
+//                     <option value="punjabi">Punjabi</option>
+//                     <option value="kashmiri">Kashmiri</option>
+//                     <option value="manipuri">Manipuri</option>
+//                   </select>
+//                 </div>
+
+//                 {/* Remaining Form Fields */}
+//                 <div className="mb-3">
+//                   <label className="form-label">Date</label>
+//                   <input
+//                     type="date"
+//                     className="form-control"
+//                     name="projectDate"
+//                     value={newProject.projectDate}
+//                     onChange={handleInputChange}
+//                     required
+//                   />
+//                 </div>
+//                 <div className="mb-3">
+//                   <label className="form-label">Buyer</label>
+//                   <input
+//                     type="text"
+//                     className="form-control"
+//                     name="buyer"
+//                     value={newProject.buyer}
+//                     onChange={handleInputChange}
+//                     required
+//                   />
+//                 </div>
+//                 <div className="mb-3">
+//                   <label className="form-label">Upload Poster</label>
+//                   <input
+//                     type="file"
+//                     className="form-control"
+//                     name="poster"
+//                     onChange={handleFileChange}
+//                   />
+//                 </div>
+//                 <div className="mb-3">
+//                   <label className="form-label">Synopsis</label>
+//                   <textarea
+//                     className="form-control"
+//                     name="synopsis"
+//                     value={newProject.synopsis}
+//                     onChange={handleInputChange}
+//                   ></textarea>
+//                 </div>
+//                 <div className="mb-3">
+//                   <label className="form-label">Tentative Budget</label>
+//                   <input
+//                     type="number"
+//                     className="form-control"
+//                     name="tentativeBudget"
+//                     value={newProject.tentativeBudget}
+//                     onChange={handleInputChange}
+//                     required
+//                   />
+//                 </div>
+//               </div>
+//               <div className="modal-footer">
+//                 <button type="submit" className="btn btn-primary">
+//                   Submit
+//                 </button>
+//               </div>
+//             </form>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Project List */}
+//       <section>
+//         <div className="container">
+//           <h2 className="mb-4 mt-5">
+//             {projects.length} Project{projects.length !== 1 ? "s" : ""}
+//           </h2>
+//           {loading ? (
+//             <p>Loading projects...</p>
+//           ) : (
+//             <div className="row">
+//               {projects.map((project) => (
+//                 <div key={project._id} className="col-lg-6 col-12">
+//                   <button
+//                     data-bs-toggle="modal"
+//                     data-bs-target="#detailsModal"
+//                     onClick={() => fetchProjectById(project._id)}
+//                     className="card card-bordered mb-4 card-hover cursor-pointer"
+//                   >
+//                     <div className="card-body">
+//                       <div className="d-xl-flex">
+//                         <div className="mb-3 mb-md-0">
+//                           <img
+//                             src={project.poster || "default-image.jpg"}
+//                             alt={project.projectName}
+//                             className="icon-shape border rounded-4 object-fit-cover"
+//                             height="180"
+//                             width="170"
+//                           />
+//                         </div>
+//                         <div className="ms-xl-3 w-200 mt-3 mt-xl-1 d-flex flex-column justify-content-between">
+//                           <h3 className="mb-1 fs-4">
+//                             <span className="text-inherit">
+//                               {project.projectName}
+//                             </span>
+//                           </h3>
+//                           <span className="me-2">
+//                             <i className="bi bi-camera-reels"></i>
+//                             <span className="ms-1">{project.contentType}</span>
+//                           </span>
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </button>
+//                 </div>
+//               ))}
+//             </div>
+//           )}
+//         </div>
+//       </section>
 //     </>
 //   );
 // }
