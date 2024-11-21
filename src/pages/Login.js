@@ -92,7 +92,7 @@ function Login() {
     setLoading(true);
     try {
       const response = await axios.post(
-        "https://ott-ep3g.onrender.com/api/v1/users/register-or-login",
+        "http://localhost:8501/api/v1/users/register-or-login",
         {
           mobile: phone,
           role: role,
@@ -122,7 +122,7 @@ function Login() {
     setLoading(true);
     try {
       const response = await axios.post(
-        "https://ott-ep3g.onrender.com/api/v1/users/verify-otp",
+        "http://localhost:8501/api/v1/users/verify-otp",
         {
           mobile: phone,
           otp: otp,
@@ -138,7 +138,7 @@ function Login() {
           // If login successful
           const { token } = response.data;
           localStorage.setItem("authToken", token); // Save token in localStorage
-          navigate("/c-dashboard"); // Navigate to dashboard
+          navigate("/dashboard"); // Navigate to dashboard
         }
       } else {
         alert("Invalid OTP. Please try again.");
